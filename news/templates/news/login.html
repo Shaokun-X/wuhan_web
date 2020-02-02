@@ -1,0 +1,47 @@
+{% load i18n %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.staticfile.org/wingcss/1.0.0-beta/wing.min.css"/>
+  <!-- alternatives -->
+  <!-- http://getskeleton.com/#examples -->
+  <!-- https://docs.siimple.xyz/components/card.html -->
+  <!-- https://milligram.io/showcase.html -->
+
+  <title>{% trans "登录" %}</title>
+</head>
+
+<body>
+<div class="container horizontal-align vertical-align">
+  <section id="form">
+    <div class="row">
+      <div class="col">
+        <h2>{% trans "登录" %}</h2>
+        <form action="{% url 'news:login' %}" method="POST">
+          {% csrf_token %}
+          {{ form }}
+          <button type="submit">{% trans "确认" %}</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <section id="message">
+    <div class="row">
+      <div class="col">
+        {% if messages %}
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+        {% endif %}        
+      </div>
+    </div>
+  </section>
+    </div>
+</body>
+
+</html>

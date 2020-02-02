@@ -25,9 +25,9 @@ SECRET_KEY = '%5)8i0#(o0%xcj7y86x6a3$2utkex@y)^6)0*7p@143=e*@60r'
 ADMIN_URL = 'lpLuTqX72Bt2hLfxxRejYKeTui1ayYj1aN1ZdE59sXulINSGMXTY9ID4tYEmjrHd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -82,7 +82,7 @@ DATABASES = {
         'NAME': 'news',
         'USER': 'news',
         'PASSWORD': 'prayforwuhan2020',
-        'HOST': '49.233.200.133',
+        'HOST': 'localhost',
         'OPTIONS': {
             'client_encoding': 'UTF8',
             # 'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_DEFAULT,
@@ -128,3 +128,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = '/var/www/wuhan_web/static'

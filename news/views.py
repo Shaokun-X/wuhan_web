@@ -46,6 +46,8 @@ def index(request):
         filter_kwargs = {}
         if source:
             filter_kwargs['source'] = source
+        else:
+            source = ''
         report_set = Report.objects.filter(**filter_kwargs).order_by("-datetime")
 
         paginator = Paginator(report_set, 20)

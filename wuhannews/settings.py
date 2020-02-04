@@ -25,7 +25,7 @@ SECRET_KEY = '%5)8i0#(o0%xcj7y86x6a3$2utkex@y)^6)0*7p@143=e*@60r'
 ADMIN_URL = 'lpLuTqX72Bt2hLfxxRejYKeTui1ayYj1aN1ZdE59sXulINSGMXTY9ID4tYEmjrHd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -76,13 +76,18 @@ WSGI_APPLICATION = 'wuhannews.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+if DEBUG:
+    DB_HOST = '49.233.200.133'
+else:
+    DB_HOST = 'localhost'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'news',
         'USER': 'news',
         'PASSWORD': 'prayforwuhan2020',
-        'HOST': 'localhost',
+        'HOST': DB_HOST,
         'OPTIONS': {
             'client_encoding': 'UTF8',
             # 'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_DEFAULT,

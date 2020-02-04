@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from .models import Report, LoginForm
+from .models import Report, LoginForm, FilterForm
 
 
 def user_login(request):
@@ -41,13 +41,17 @@ def user_login(request):
 @login_required(login_url='/login/')
 def index(request):
     if request.method == 'GET':
-        source = request.GET.get('source')
+        source = request.GET.get('source', default='')
 
         filter_kwargs = {}
-        if source:
-            filter_kwargs['source'] = source
+        filter_form = FilterForm(request.GET)
+        if filter_form.is_valid():
+            for k, v in filter_form.cleaned_data.items():
+                if v:
+                    filter_kwargs[k] = v
         else:
-            source = ''
+            messages.error(request, _("筛选条件填写错误。"))
+        
         report_set = Report.objects.filter(**filter_kwargs).order_by("-datetime")
 
         paginator = Paginator(report_set, 20)
@@ -66,6 +70,7 @@ def index(request):
                 'page': page,
                 'source': source,
                 'admin_url': admin_url,
+                'filter_form': filter_form,
             }
         )
     else:

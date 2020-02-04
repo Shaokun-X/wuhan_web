@@ -7,11 +7,17 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <!-- CSS -->
   <link rel="stylesheet" href="https://cdn.staticfile.org/wingcss/1.0.0-beta/wing.min.css"/>
 
   <title>{% trans "武汉疫情新闻记录" %}</title>
   <style>
+    body {
+      background: #f5f5f5;
+      color: #202020;
+    }
     .card {
       background: #FAFAFA;
       flex-direction: column;
@@ -41,10 +47,23 @@
       overflow: hidden;
       margin-bottom: 2rem;
     }
+    button:hover {
+      cursor: pointer;
+    }
+    a.selected {
+      font-weight: bold;
+      color: #111;
+      text-decoration: none;
+    }
+    a.selected:hover {
+      font-weight: bold;
+      color: #111;
+      text-decoration: underline;
+    }
     a.paginator:hover {
       background: 0 0;
-      border: 1.5px solid #444;
       color: #444;
+      cursor: pointer;
     }
     a.paginator {
       -webkit-appearance: button;
@@ -84,9 +103,11 @@
       color: #111;
       border: 1.5px solid #111;
     }
-    body {
-      background: #f5f5f5;
-      color: #202020;
+    @media screen and (min-width: 768px){
+      .col{
+        margin-left: 4%;
+        margin-right: 4%;
+      }
     }
   </style>
 </head>
@@ -96,43 +117,67 @@
 <section id="title" class="center text-center container">
   <div>
   <h3>{% trans "📰武汉疫情新闻记录" %}</h3>
-  <h6><em>{% trans "“以记忆对抗极权。”" %}</em></h5>
+  <h6><em>{% trans "“以记忆对抗极权。”" %}</em></h6>
   </div>
 </section>
 
 <section id="navbar" class="center text-center container">
-<div class="nav">
-  <a class="nav-item" href='?source='>{% trans "所有" %}</a>
-  <a class="nav-item" href='?source=新京报'>{% trans "新京报" %}</a>
-  <a class="nav-item" href='?source=财新'>{% trans "财新网" %}</a>
-  <a class="nav-item" href='?source=澎湃'>{% trans "澎湃新闻" %}</a>
-  {% if user.is_staff %}
-  <a class="nav-item" href={{ admin_url }}>{% trans "后台" %}</a>
-  {% endif %}  
-</div>
+  <div class="row">
+    <div class="nav">
+      <a class="nav-item {% if source == '' %}selected{% endif %}" href='?source='>{% trans "所有" %}</a>
+      <a class="nav-item {% if source == '新京报' %}selected{% endif %}" href='?source=新京报'>{% trans "新京报" %}</a>
+      <a class="nav-item {% if source == '财新' %}selected{% endif %}" href='?source=财新'>{% trans "财新网" %}</a>
+      <a class="nav-item {% if source == '澎湃' %}selected{% endif %}" href='?source=澎湃'>{% trans "澎湃新闻" %}</a>
+      {% if user.is_staff %}
+        <a class="nav-item" href={{ admin_url }}>{% trans "后台" %}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section id="filter" class="center container">
+  <form action="#" method='GET'>
+    <div class="row container">
+      {% for field in filter_form %}
+      {% if not field.is_hidden %}
+      <div class="col">
+        {{ field }}
+        {{ field.errors }}
+      </div>
+      {% else %}
+      {{ field }}
+      {% endif %}
+      {% endfor %}
+      <div class="col">
+        <button type="submit">{% trans "筛选" %}</button>
+      </div>
+    </div>
+  </form>
 </section>
 
 <section id="content" class="center container">
   <div class="cards">
-{% for report in reports %}
-    <div class="card">
-      <h5 class="card-header text-center">{{ report.title }}</h5>
-      <div class="card-body">{{ report.content | linebreaks }}</div>
-      <div class="card-footer center text-center"><p>{{ report.source }} {{ report.datetime }}</p></div>
-    </div>
-{% endfor %}
+    {% for report in reports %}
+      <div class="card">
+        <h5 class="card-header text-center">{{ report.title }}</h5>
+        <div class="card-body">{{ report.content | linebreaks }}</div>
+        <div class="card-footer center text-center"><p>{{ report.source }} {{ report.datetime }}</p></div>
+      </div>
+    {% empty %}
+    {% trans "无结果" %}
+    {% endfor %}
   </div>
 </section>
 
 <section id="pagination" class="center text-center container">
   {% if reports.has_previous %}
-    <a class='paginator' href="?page=1&source={{ source }}">{% trans "首页" %}</a>&nbsp;&nbsp;
-    <a class='paginator' href="?page={{ reports.previous_page_number }}&source={{ source }}">{% trans "上一页" %}</a>&nbsp;&nbsp;
+    <a class='paginator' href="?page=1{% for field in filter_form %}&{{field.name}}={{field.value|default_if_none:''}}{% endfor %}">{% trans "首页" %}</a>&nbsp;&nbsp;
+    <a class='paginator' href="?page={{ reports.previous_page_number }}{% for field in filter_form %}&{{field.name}}={{field.value|default_if_none:''}}{% endfor %}">{% trans "上一页" %}</a>&nbsp;&nbsp;
   {% endif %}
   {% trans "第" %}{{ page }}{% trans "页" %}
   {% if reports.has_next %}
-    &nbsp;&nbsp;<a class='paginator' href="?page={{ reports.next_page_number }}&source={{ source }}">{% trans "下一页" %}</a>
-    &nbsp;&nbsp;<a class='paginator' href="?page={{ reports.paginator.num_pages }}&source={{ source }}">{% trans "末页" %}</a>
+    &nbsp;&nbsp;<a class='paginator' href="?page={{ reports.next_page_number }}{% for field in filter_form %}&{{field.name}}={{field.value|default_if_none:''}}{% endfor %}">{% trans "下一页" %}</a>
+    &nbsp;&nbsp;<a class='paginator' href="?page={{ reports.paginator.num_pages }}{% for field in filter_form %}&{{field.name}}={{field.value|default_if_none:''}}{% endfor %}">{% trans "末页" %}</a>
   {% endif %}
 </section>
 

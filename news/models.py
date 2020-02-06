@@ -3,6 +3,9 @@ from django.utils.translation import gettext_lazy as _
 from django import forms
 
 
+THUMBNAIL_MAX = 150
+
+
 class Report(models.Model):
 
     title = models.CharField(max_length=200, unique=True)
@@ -12,6 +15,9 @@ class Report(models.Model):
 
     def __str__(self):
         return self.title
+
+    def thumbnail(self):
+        return self.content if len(self.content) <= THUMBNAIL_MAX else self.content[:THUMBNAIL_MAX] + " ……"
 
     class Meta:
         db_table = 'report'

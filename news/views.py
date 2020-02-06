@@ -1,10 +1,10 @@
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpResponseBadRequest
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from .models import Report, LoginForm, FilterForm
 
@@ -35,7 +35,7 @@ def user_login(request):
             messages.error(request, _("数据错误。"))
             return redirect(reverse('news:login'))
     else:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
 
 @login_required(login_url='/login/')
@@ -74,4 +74,50 @@ def index(request):
             }
         )
     else:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
+
+
+@login_required(login_url='/login/')
+def detail(request, pk):
+    if request.method == 'GET':
+        report = get_object_or_404(Report, pk=pk)
+        return render(
+            request,
+            'news/detail.html',
+            {
+                'report': report,
+            }
+        )
+    else:
+        return HttpResponseBadRequest()
+
+
+@login_required(login_url='/login/')
+@permission_required('news.delete_report')
+def delete(request, pk):
+    if request.method == 'GET':
+        # flag
+        is_result = False
+        report = get_object_or_404(Report, pk=pk)
+        return render(
+            request,
+            'news/delete.html',
+            {
+                'report': report,
+                'is_result': is_result,
+            }
+        )
+    elif request.method == 'POST':
+        report = get_object_or_404(Report, pk=pk)
+        report.delete()
+        is_result = True
+        return render(
+            request,
+            'news/delete.html',
+            {
+                'report': report,
+                'is_result': is_result,
+            }
+        )
+    else:
+        return HttpResponseBadRequest()
